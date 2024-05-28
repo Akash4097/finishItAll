@@ -62,7 +62,7 @@ void main() {
     test(
         'deleteTask: delete a task and return true on successfully deleted'
         'a task of specific id from the database', () async {
-// Arrange
+      // Arrange
       final task = Task(id: '1', title: 'Test Task');
       await local.addTask(task);
 
@@ -118,6 +118,48 @@ void main() {
 
       // Assert
       expect(result, isNull);
+    });
+  });
+
+  group("DriftLocalDataSource getTasks() Tests", () {
+    late DriftLocalDataSource local;
+    late DriftAppDatabase database;
+    setUp(() async {
+      database = DriftAppDatabase(db: NativeDatabase.memory());
+
+      local = DriftLocalDataSource(driftAppDatabase: database);
+    });
+
+    tearDown(() async {
+      await database.close();
+    });
+
+    test('getTasks return empty list when no task has found', () async {
+      // Act
+      final result = await local.geTasks();
+
+      // Assert
+      expect(result.length, 0);
+    });
+
+    test('getTasks successfully fetches all tasks', () async {
+      // Arrange
+      final taskDataList = [
+        Task(id: '1', title: 'Task 1'),
+        Task(id: '2', title: 'Task 2'),
+      ];
+      local.addTask(taskDataList[0]);
+      local.addTask(taskDataList[1]);
+
+      // Act
+      final result = await local.geTasks();
+
+      // Assert
+      expect(result.length, 2);
+      expect(result[0].id, '1');
+      expect(result[0].title, 'Task 1');
+      expect(result[1].id, '2');
+      expect(result[1].title, 'Task 2');
     });
   });
 }
