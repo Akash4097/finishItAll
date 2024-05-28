@@ -1,3 +1,5 @@
+import 'package:drift/native.dart';
+
 import 'drift_app_database.dart';
 
 import '../../data_source.dart';
@@ -19,9 +21,17 @@ class DriftLocalDataSource implements DataSource {
             ),
           );
       return true;
+    } on SqliteException catch (e) {
+      rethrow;
+      // rethrow SqliteException(
+      //   1555,
+      //   "Failed to add task of the duplicate ids to the database."
+      //   "Task ID: ${task.id}, Title: ${task.title}. Error: $e",
+      // );
     } on Exception catch (e) {
       throw Exception(
-        "Failed to add task to the database. Task ID: ${task.id}, Title: ${task.title}. Error: $e",
+        "Failed to add task to the database. "
+        "Task ID: ${task.id}, Title: ${task.title}. Error: $e",
       );
     }
   }

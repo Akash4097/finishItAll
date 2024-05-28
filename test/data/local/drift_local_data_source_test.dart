@@ -32,5 +32,16 @@ void main() {
       expect(insertedTask.title, task.title);
       expect(insertedTask.id, task.id);
     });
+
+    test('addTask throw Exception when inserting duplicate task ID', () async {
+      //Arrange
+      final task = Task(id: '1', title: 'Test Task 1');
+      final task2 = Task(id: '1', title: 'Test Task 2');
+      await local.addTask(task);
+
+      // Act & Assert
+      expect(() async => await local.addTask(task2),
+          throwsA(isA<SqliteException>()));
+    });
   });
 }
