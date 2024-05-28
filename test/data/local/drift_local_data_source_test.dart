@@ -84,4 +84,40 @@ void main() {
       expect(result, false);
     });
   });
+
+  group("DriftLocalDataSource getTask(taskId) Tests", () {
+    late DriftLocalDataSource local;
+    late DriftAppDatabase database;
+    setUp(() async {
+      database = DriftAppDatabase(db: NativeDatabase.memory());
+
+      local = DriftLocalDataSource(driftAppDatabase: database);
+    });
+
+    tearDown(() async {
+      await database.close();
+    });
+
+    test('getTask successfully fetches an existing task', () async {
+      // Arrange
+      final task = Task(id: '1', title: 'Test Task');
+      await local.addTask(task);
+
+      // Act
+      final result = await local.getTask(task.id);
+
+      // Assert
+      expect(result, isNotNull);
+      expect(result?.id, task.id);
+      expect(result?.title, task.title);
+    });
+
+    test('getTask returns null when task does not exist', () async {
+      // Act
+      final result = await local.getTask("9");
+
+      // Assert
+      expect(result, isNull);
+    });
+  });
 }

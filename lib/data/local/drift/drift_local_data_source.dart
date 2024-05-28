@@ -54,13 +54,29 @@ class DriftLocalDataSource implements DataSource {
   }
 
   @override
-  Future<List<Task>> geTasks() {
-    throw UnimplementedError();
+  Future<List<Task>> geTasks() async {
+    return <Task>[];
   }
 
   @override
-  Future<Task> getTask(String taskId) {
-    throw UnimplementedError();
+  Future<Task?> getTask(String taskId) async {
+    try {
+      // Fetch the task from the database
+      final taskData = await (_db.select(_db.taskDriftEntitry)
+            ..where((tbl) => tbl.id.equals(taskId)))
+          .getSingleOrNull();
+
+      if (taskData == null) {
+        return null;
+      }
+
+      // Convert the database entity to a Task model
+      final task = Task(id: taskData.id, title: taskData.title);
+      return task;
+    } on Exception catch (e) {
+      throw Exception(
+          "Database error occurred while fetching task. Task ID: $taskId. Error: $e");
+    }
   }
 
   @override
