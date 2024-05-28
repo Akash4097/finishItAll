@@ -1,9 +1,9 @@
+import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 
-import 'drift_app_database.dart';
-
-import '../../data_source.dart';
 import '../../../data_models/task.dart';
+import '../../data_source.dart';
+import 'drift_app_database.dart';
 
 class DriftLocalDataSource implements DataSource {
   final DriftAppDatabase _db;
@@ -92,7 +92,29 @@ class DriftLocalDataSource implements DataSource {
   }
 
   @override
-  Future<Task> updateTask(Task updatedTask) {
-    throw UnimplementedError();
+  Future<bool> updateTask(Task updatedTask) async {
+    try {
+      // Check if the task exists
+      final taskExists = await (_db.select(_db.taskDriftEntitry)
+            ..where((tbl) => tbl.id.equals(updatedTask.id)))
+          .getSingleOrNull();
+
+      if (taskExists == null) {
+        return false;
+      }
+
+      // Update the task
+      await (_db.update(_db.taskDriftEntitry)
+            ..where((tbl) => tbl.id.equals(updatedTask.id)))
+          .write(
+        TaskDriftEntitryCompanion(
+          title: Value(updatedTask.title),
+        ),
+      );
+      return true;
+    } on Exception catch (e) {
+      throw Exception(
+          "Database error occurred while updating task. Task ID: ${updatedTask.id}. Error: $e");
+    }
   }
 }

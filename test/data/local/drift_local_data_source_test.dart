@@ -162,4 +162,47 @@ void main() {
       expect(result[1].title, 'Task 2');
     });
   });
+
+  group("DriftLocalDataSource updateTask(task) Tests", () {
+    late DriftLocalDataSource local;
+    late DriftAppDatabase database;
+    setUp(() async {
+      database = DriftAppDatabase(db: NativeDatabase.memory());
+
+      local = DriftLocalDataSource(driftAppDatabase: database);
+    });
+
+    tearDown(() async {
+      await database.close();
+    });
+
+    test('updateTask successfully updates an existing task', () async {
+      // Arrange
+      const taskId = '1';
+      final taskData = Task(id: taskId, title: 'Old Task');
+      await local.addTask(taskData);
+
+      final updatedTask = Task(id: taskId, title: 'Updated Task');
+
+      // Act
+      final result = await local.updateTask(updatedTask);
+
+      // Assert
+      expect(result, true);
+      final updatedTaskData = await local.getTask(taskId);
+      expect(updatedTaskData?.title, updatedTask.title);
+    });
+
+    test('updateTask returns false when task does not exist', () async {
+      // Arrange
+      const taskId = '1';
+      final updatedTask = Task(id: taskId, title: 'Updated Task');
+
+      // Act
+      final result = await local.updateTask(updatedTask);
+
+      // Assert
+      expect(result, false);
+    });
+  });
 }

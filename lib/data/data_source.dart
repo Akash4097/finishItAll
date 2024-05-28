@@ -5,5 +5,5 @@ abstract interface class DataSource {
   Future<bool> deleteTask(String taskId);
   Future<Task?> getTask(String taskId);
   Future<List<Task>> geTasks();
-  Future<Task> updateTask(Task updatedTask);
+  Future<bool> updateTask(Task updatedTask);
 }
