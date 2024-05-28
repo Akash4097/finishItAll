@@ -5,7 +5,7 @@ import 'package:finish_it_all/data_models/task.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group("DriftLocalDataSource Tests", () {
+  group("DriftLocalDataSource addTask() Tests", () {
     late DriftLocalDataSource local;
     late DriftAppDatabase database;
     setUp(() async {
@@ -33,7 +33,8 @@ void main() {
       expect(insertedTask.id, task.id);
     });
 
-    test('addTask throw Exception when inserting duplicate task ID', () async {
+    test('addTask rethrow Exception when inserting duplicate task ID',
+        () async {
       //Arrange
       final task = Task(id: '1', title: 'Test Task 1');
       final task2 = Task(id: '1', title: 'Test Task 2');
@@ -42,6 +43,45 @@ void main() {
       // Act & Assert
       expect(() async => await local.addTask(task2),
           throwsA(isA<SqliteException>()));
+    });
+  });
+
+  group("DriftLocalDataSource deleteTask() Tests", () {
+    late DriftLocalDataSource local;
+    late DriftAppDatabase database;
+    setUp(() async {
+      database = DriftAppDatabase(db: NativeDatabase.memory());
+
+      local = DriftLocalDataSource(driftAppDatabase: database);
+    });
+
+    tearDown(() async {
+      await database.close();
+    });
+
+    test(
+        'deleteTask: delete a task and return true on successfully deleted'
+        'a task of specific id from the database', () async {
+// Arrange
+      final task = Task(id: '1', title: 'Test Task');
+      await local.addTask(task);
+
+      // Act
+      final result = await local.deleteTask(task.id);
+
+      // Assert
+      expect(result, true);
+      final fetchedTask =
+          await database.select(database.taskDriftEntitry).getSingleOrNull();
+      expect(fetchedTask, isNull);
+    });
+
+    test('deleteTask returns false when task does not exist', () async {
+      // Act
+      final result = await local.deleteTask('non_existing_id');
+
+      // Assert
+      expect(result, false);
     });
   });
 }

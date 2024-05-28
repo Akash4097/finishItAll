@@ -23,11 +23,6 @@ class DriftLocalDataSource implements DataSource {
       return true;
     } on SqliteException catch (e) {
       rethrow;
-      // rethrow SqliteException(
-      //   1555,
-      //   "Failed to add task of the duplicate ids to the database."
-      //   "Task ID: ${task.id}, Title: ${task.title}. Error: $e",
-      // );
     } on Exception catch (e) {
       throw Exception(
         "Failed to add task to the database. "
@@ -37,8 +32,25 @@ class DriftLocalDataSource implements DataSource {
   }
 
   @override
-  Future<bool> deleteTask(String taskId) {
-    throw UnimplementedError();
+  Future<bool> deleteTask(String taskId) async {
+    try {
+      // Check if the task exists
+      final taskExists = await (_db.select(_db.taskDriftEntitry)
+            ..where((tbl) => tbl.id.equals(taskId)))
+          .getSingleOrNull();
+
+      if (taskExists == null) {
+        return false;
+      }
+
+      // Delete the task
+      await (_db.delete(_db.taskDriftEntitry)
+            ..where((tbl) => tbl.id.equals(taskId)))
+          .go();
+      return true;
+    } on Exception catch (e) {
+      rethrow;
+    }
   }
 
   @override
