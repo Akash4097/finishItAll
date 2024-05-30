@@ -25,7 +25,7 @@ class AppLogger implements Logger {
 
   @override
   void error(String message, [Exception? exception]) {
-    _logger.error(message);
+    _logger.error(message, exception);
   }
 
   @override
@@ -36,6 +36,11 @@ class AppLogger implements Logger {
   @override
   void warning(String message) {
     _logger.warning(message);
+  }
+
+  @override
+  void severe(String message, [Exception? exception]) {
+    _logger.critical(message, exception);
   }
 }
 
