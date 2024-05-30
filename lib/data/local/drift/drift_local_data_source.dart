@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:finish_it_all/common/app_logger/app_logger.dart';
 
 import '../../../data_models/task.dart';
 import '../../data_source.dart';
@@ -10,6 +11,7 @@ class DriftLocalDataSource implements DataSource {
 
   DriftLocalDataSource({required DriftAppDatabase driftAppDatabase})
       : _db = driftAppDatabase;
+  final _logger = AppLogger.init(DriftLocalDataSource);
 
   @override
   Future<bool> addTask(Task task) async {
@@ -20,6 +22,7 @@ class DriftLocalDataSource implements DataSource {
               id: task.id,
             ),
           );
+      _logger.debug("$runtimeType || add new task");
       return true;
     } on SqliteException catch (e) {
       rethrow;

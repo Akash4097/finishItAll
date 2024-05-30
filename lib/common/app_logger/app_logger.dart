@@ -1,62 +1,51 @@
 import 'package:talker_flutter/talker_flutter.dart';
-
 import 'logger.dart';
 
 class AppLogger implements Logger {
-  AppLogger._init();
+  final Type type;
 
-  static final AppLogger _instance = AppLogger._init();
-  final _logger = TalkerFlutter.init(
-    settings: TalkerSettings(),
-    logger: _CustomTalkerLogger(TalkerSettings()),
-  );
+  AppLogger._init(this.type) {
+    _logger = TalkerFlutter.init(
+        logger: _CustomTalkerLogger(type), settings: TalkerSettings());
+  }
 
-  factory AppLogger.init() => _instance;
+  static AppLogger? _instance;
+  late final Talker _logger;
 
-  @override
-  void debug(Object object, String message) {
-    _logger.debug(
-      "${object.toString()} || $message",
-    );
+  factory AppLogger.init(Type type) {
+    _instance ??= AppLogger._init(type);
+
+    return _instance!;
   }
 
   @override
-  void error(Object object, String message, [Exception? exception]) {
-    _logger.error("${object.toString()} || $message");
+  void debug(String message) {
+    _logger.debug(message);
   }
 
   @override
-  void info(Object object, String message) {
-    _logger.info("${object.toString()} || $message");
+  void error(String message, [Exception? exception]) {
+    _logger.error(message);
   }
 
   @override
-  void warning(Object object, String message) {
-    _logger.warning("${object.toString()} || $message");
+  void info(String message) {
+    _logger.info(message);
+  }
+
+  @override
+  void warning(String message) {
+    _logger.warning(message);
   }
 }
 
 class _CustomTalkerLogger extends TalkerLogger {
-  _CustomTalkerLogger(TalkerSettings settings) : super();
+  final Type type;
+  _CustomTalkerLogger(this.type) : super();
 
   @override
   void log(msg, {LogLevel? level, AnsiPen? pen}) {
-    final filename = _getFilename();
-    final customMessage = '[$filename] $msg';
-    super.log(customMessage, level: level, pen: pen);
-  }
-
-  String _getFilename() {
-    // Use StackTrace to get the filename
-    final stackTrace = StackTrace.current;
-    final frames = stackTrace.toString().split('\n');
-    if (frames.length > 1) {
-      final frame = frames[1];
-      final match = RegExp(r'(\w+\.dart)').firstMatch(frame);
-      if (match != null) {
-        return match.group(1) ?? 'unknown';
-      }
-    }
-    return 'unknown';
+    final customMsg = "$type || $msg";
+    super.log(customMsg, level: level, pen: pen);
   }
 }

@@ -1,6 +1,6 @@
 abstract interface class Logger {
-  void debug(Object object, String message);
-  void info(Object object, String message);
-  void warning(Object object, String message);
-  void error(Object object, String message, [Exception? exception]);
+  void debug(String message);
+  void info(String message);
+  void warning(String message);
+  void error(String message, [Exception? exception]);
 }

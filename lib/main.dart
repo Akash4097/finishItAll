@@ -11,7 +11,6 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    appLogger.debug(this, "main message");
     return const MaterialApp(
       home: Scaffold(
         body: Center(
