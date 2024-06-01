@@ -1,7 +1,5 @@
-import 'package:finish_it_all/common/app_logger/app_logger.dart';
 import 'package:flutter/material.dart';
 
-final appLogger = AppLogger.init();
 void main() {
   runApp(const MainApp());
 }

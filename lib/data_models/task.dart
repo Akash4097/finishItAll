@@ -1,4 +1,6 @@
-class Task {
+import 'activity.dart';
+
+class Task implements Activity {
   final String id;
   final String title;
   Task({
