@@ -8,10 +8,10 @@ abstract class Activity {
   Activity({
     required this.id,
     required this.title,
-    this.description,
     required this.createdAt,
+    this.status = Status.idle,
     this.updatedAt,
-    required this.status,
+    this.description,
   });
 
   @override
