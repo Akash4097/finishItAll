@@ -62,9 +62,11 @@ class Task extends Activity {
         title: map['title'],
         description: map['description'],
         updatedAt: map['updatedAt'],
-        status: Status.values.byName(map['status']),
+        status: map['status'] != null
+            ? Status.values.byName(map['status'])
+            : Status.idle,
         dueDate: DateTime.fromMillisecondsSinceEpoch(map['dueDate'] as int),
-        totalTime: map['totalTime'] as double,
+        totalTime: map['totalTime'] ?? 0.0,
         tags: map['tags'] != null
             ? List<Tag>.from(
                 (map['tags'] as List<Map<String, dynamic>>)

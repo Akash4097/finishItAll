@@ -1,3 +1,4 @@
+import 'package:finish_it_all/data_models/activity.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:finish_it_all/data_models/task.dart';
 import 'package:finish_it_all/data_models/tag.dart';
@@ -79,6 +80,46 @@ void main() {
 
       expect(task == sameTask, true);
       expect(task == differentTask, false);
+    });
+
+    test('toJson method with only required fields', () {
+      final task = Task(
+        dueDate: DateTime(2023, 12, 31),
+        id: '1',
+        title: 'Test Task',
+        createdAt: DateTime(2023, 1, 1),
+      );
+
+      final json = task.toJson();
+
+      expect(json['id'], '1');
+      expect(json['dueDate'], DateTime(2023, 12, 31).millisecondsSinceEpoch);
+      expect(json['createdAt'], DateTime(2023, 1, 1).millisecondsSinceEpoch);
+      expect(json['title'], 'Test Task');
+      expect(json['description'], isNull);
+      expect(json['updatedAt'], isNull);
+      expect(json['status'], 'idle');
+      expect(json['totalTime'], 0.0);
+      expect(json['tags'], isNull);
+    });
+
+    test('fromJson method with only required fields', () {
+      final Map<String, dynamic> json = {
+        'id': '1',
+        'dueDate': DateTime(2023, 12, 31).millisecondsSinceEpoch,
+        'createdAt': DateTime(2023, 1, 1).millisecondsSinceEpoch,
+        'title': 'Test Task',
+      };
+
+      final Task task = Task.fromJson(json);
+
+      expect(task.id, '1');
+      expect(task.dueDate, DateTime(2023, 12, 31));
+      expect(task.createdAt, DateTime(2023, 1, 1));
+      expect(task.title, 'Test Task');
+      expect(task.totalTime, 0.0);
+      expect(task.tags, isNull);
+      expect(task.status, Status.idle);
     });
   });
 }
