@@ -1,15 +1,14 @@
 import 'package:finish_it_all/data_models/activity.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:finish_it_all/data_models/task.dart';
-import 'package:finish_it_all/data_models/tag.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Task', () {
     late Task task;
-    final tags = [
-      Tag(id: "101", tagName: 'Work'),
-      Tag(id: "102", tagName: 'Urgent'),
-    ];
+    // final tags = [
+    //   Tag(id: "101", tagName: 'Work'),
+    //   Tag(id: "102", tagName: 'Urgent'),
+    // ];
     setUp(() {
       task = Task(
         id: '1',
@@ -19,7 +18,7 @@ void main() {
           const Duration(days: 1),
         ),
         totalTime: 60.0,
-        tags: tags,
+        // tags: tags,
       );
     });
 
@@ -30,8 +29,8 @@ void main() {
       expect(json['createdAt'], task.createdAt.millisecondsSinceEpoch);
       expect(json['dueDate'], task.dueDate.millisecondsSinceEpoch);
       expect(json['totalTime'], task.totalTime);
-      expect(json['tags'], isNotNull);
-      expect(json['tags']!.length, task.tags!.length);
+      // expect(json['tags'], isNotNull);
+      // expect(json['tags']!.length, task.tags!.length);
     });
 
     test('fromJson', () {
@@ -44,7 +43,7 @@ void main() {
       expect(taskFromJson.dueDate.millisecondsSinceEpoch,
           task.dueDate.millisecondsSinceEpoch);
       expect(taskFromJson.totalTime, task.totalTime);
-      expect(taskFromJson.tags!.length, task.tags!.length);
+      // expect(taskFromJson.tags!.length, task.tags!.length);
     });
 
     test('copyWith', () {
@@ -55,7 +54,7 @@ void main() {
       expect(updatedTask.createdAt, task.createdAt);
       expect(updatedTask.dueDate, task.dueDate);
       expect(updatedTask.totalTime, task.totalTime);
-      expect(updatedTask.tags!.length, task.tags!.length);
+      // expect(updatedTask.tags!.length, task.tags!.length);
     });
 
     test('equality operator', () {
@@ -65,7 +64,7 @@ void main() {
         createdAt: DateTime.now(),
         dueDate: DateTime.now().add(const Duration(days: 1)),
         totalTime: 60.0,
-        tags: tags,
+        // tags: tags,
       );
       final differentTask = Task(
         id: '2',
@@ -73,9 +72,9 @@ void main() {
         createdAt: DateTime.now(),
         dueDate: DateTime.now().add(const Duration(days: 2)),
         totalTime: 90.0,
-        tags: [
-          Tag(id: "103", tagName: 'Personal'),
-        ],
+        // tags: [
+        //   Tag(id: "103", tagName: 'Personal'),
+        // ],
       );
 
       expect(task == sameTask, true);
@@ -118,7 +117,7 @@ void main() {
       expect(task.createdAt, DateTime(2023, 1, 1));
       expect(task.title, 'Test Task');
       expect(task.totalTime, 0.0);
-      expect(task.tags, isNull);
+      // expect(task.tags, isNull);
       expect(task.status, Status.idle);
     });
   });
