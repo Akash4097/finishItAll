@@ -11,6 +11,13 @@ part 'drift_app_database.g.dart';
 class TaskDriftEntitry extends Table {
   TextColumn get id => text()();
   TextColumn get title => text()();
+  TextColumn get description => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime().nullable()();
+  DateTimeColumn get dueDate => dateTime()();
+  RealColumn get totalTime => real().withDefault(const Constant(0.0))();
+  TextColumn get status => text().withDefault(const Constant('idle'))();
+
   @override
   Set<Column<Object>>? get primaryKey => {id};
 }
