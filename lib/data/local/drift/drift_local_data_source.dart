@@ -18,6 +18,11 @@ class DriftLocalDataSource implements DataSource {
   Future<bool> addActivity(Activity activity) async {
     if (activity is Task) {
       final task = activity;
+      if (!task.dueDate.isAfter(task.createdAt)) {
+        _logger.info(
+            "addActivity(): can't add new task having dueDate before createdAt date");
+        throw Exception('Task(Activity) dueDate must be after createdAt date');
+      }
       try {
         await _db.into(_db.taskDriftEntitry).insert(
               TaskDriftEntitryCompanion.insert(

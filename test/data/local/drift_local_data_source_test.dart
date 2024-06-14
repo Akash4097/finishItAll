@@ -66,9 +66,25 @@ void main() {
       expect(() async => await local.addActivity(task2),
           throwsA(isA<SqliteException>()));
     });
-  });
 
-  //TODO: write for a test to check the dueDate must be after createdAt date.
+    test(
+        'addActivity throw Exception when'
+        ' inserting dueDate before the createdAt dateTime', () async {
+      //Arrange
+      final task = Task(
+        id: '1',
+        title: 'Test Task',
+        createdAt: DateTime.now(),
+        dueDate: DateTime.now().subtract(
+          const Duration(days: 1),
+        ),
+      );
+
+      // Act & Assert
+      expect(
+          () async => await local.addActivity(task), throwsA(isA<Exception>()));
+    });
+  });
 
   group("DriftLocalDataSource deleteActivity() Tests", () {
     late DriftLocalDataSource local;
