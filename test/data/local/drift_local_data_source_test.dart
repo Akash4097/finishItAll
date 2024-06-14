@@ -5,7 +5,7 @@ import 'package:finish_it_all/data_models/task.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group("DriftLocalDataSource addTask() Tests", () {
+  group("DriftLocalDataSource addActivity() Tests", () {
     late DriftLocalDataSource local;
     late DriftAppDatabase database;
     setUp(() async {
@@ -18,12 +18,20 @@ void main() {
       await database.close();
     });
 
-    test('addTask returns true on successfully added new task', () async {
+    test('addActivity returns true on successfully added new task as Activity',
+        () async {
       //Arrange
-      final task = Task(id: '1', title: 'Test Task');
+      final task = Task(
+        id: '1',
+        title: 'Test Task',
+        createdAt: DateTime.now(),
+        dueDate: DateTime.now().add(
+          const Duration(days: 1),
+        ),
+      );
 
       // Act
-      final result = await local.addTask(task);
+      final result = await local.addActivity(task);
 
       // Assert
       expect(result, true);
@@ -33,20 +41,36 @@ void main() {
       expect(insertedTask.id, task.id);
     });
 
-    test('addTask rethrow Exception when inserting duplicate task ID',
+    test('addActivity rethrow Exception when inserting duplicate task ID',
         () async {
       //Arrange
-      final task = Task(id: '1', title: 'Test Task 1');
-      final task2 = Task(id: '1', title: 'Test Task 2');
-      await local.addTask(task);
+      final task = Task(
+        id: '1',
+        title: 'Test Task',
+        createdAt: DateTime.now(),
+        dueDate: DateTime.now().add(
+          const Duration(days: 1),
+        ),
+      );
+      final task2 = Task(
+        id: '1',
+        title: 'Test Task2',
+        createdAt: DateTime.now(),
+        dueDate: DateTime.now().add(
+          const Duration(days: 2),
+        ),
+      );
+      await local.addActivity(task);
 
       // Act & Assert
-      expect(() async => await local.addTask(task2),
+      expect(() async => await local.addActivity(task2),
           throwsA(isA<SqliteException>()));
     });
   });
 
-  group("DriftLocalDataSource deleteTask() Tests", () {
+  //TODO: write for a test to check the dueDate must be after createdAt date.
+
+  group("DriftLocalDataSource deleteActivity() Tests", () {
     late DriftLocalDataSource local;
     late DriftAppDatabase database;
     setUp(() async {
@@ -60,14 +84,21 @@ void main() {
     });
 
     test(
-        'deleteTask: delete a task and return true on successfully deleted'
+        'deleteActivity: delete a task(Activity) and return true on successfully deleted'
         'a task of specific id from the database', () async {
       // Arrange
-      final task = Task(id: '1', title: 'Test Task');
-      await local.addTask(task);
+      final task = Task(
+        id: '1',
+        title: 'Test Task',
+        createdAt: DateTime.now(),
+        dueDate: DateTime.now().add(
+          const Duration(days: 1),
+        ),
+      );
+      await local.addActivity(task);
 
       // Act
-      final result = await local.deleteTask(task.id);
+      final result = await local.deleteActivity(task.id);
 
       // Assert
       expect(result, true);
@@ -76,16 +107,17 @@ void main() {
       expect(fetchedTask, isNull);
     });
 
-    test('deleteTask returns false when task does not exist', () async {
+    test('deleteActivity returns false when task(Activity) does not exist',
+        () async {
       // Act
-      final result = await local.deleteTask('non_existing_id');
+      final result = await local.deleteActivity('non_existing_id');
 
       // Assert
       expect(result, false);
     });
   });
 
-  group("DriftLocalDataSource getTask(taskId) Tests", () {
+  group("DriftLocalDataSource getActivity(taskId) Tests", () {
     late DriftLocalDataSource local;
     late DriftAppDatabase database;
     setUp(() async {
@@ -98,13 +130,21 @@ void main() {
       await database.close();
     });
 
-    test('getTask successfully fetches an existing task', () async {
+    test('getActivity successfully fetches an existing task(Activity)',
+        () async {
       // Arrange
-      final task = Task(id: '1', title: 'Test Task');
-      await local.addTask(task);
+      final task = Task(
+        id: '1',
+        title: 'Test Task',
+        createdAt: DateTime.now(),
+        dueDate: DateTime.now().add(
+          const Duration(days: 1),
+        ),
+      );
+      await local.addActivity(task);
 
       // Act
-      final result = await local.getTask(task.id);
+      final result = await local.getActivity(task.id);
 
       // Assert
       expect(result, isNotNull);
@@ -112,16 +152,17 @@ void main() {
       expect(result?.title, task.title);
     });
 
-    test('getTask returns null when task does not exist', () async {
+    test('getActivity returns null when task(Activity) does not exist',
+        () async {
       // Act
-      final result = await local.getTask("9");
+      final result = await local.getActivity("9");
 
       // Assert
       expect(result, isNull);
     });
   });
 
-  group("DriftLocalDataSource getTasks() Tests", () {
+  group("DriftLocalDataSource getActivities() Tests", () {
     late DriftLocalDataSource local;
     late DriftAppDatabase database;
     setUp(() async {
@@ -134,36 +175,51 @@ void main() {
       await database.close();
     });
 
-    test('getTasks return empty list when no task has found', () async {
+    test('getActivities return empty list when no task has found', () async {
       // Act
-      final result = await local.geTasks();
+      final result = await local.getActivities();
 
       // Assert
       expect(result.length, 0);
     });
 
-    test('getTasks successfully fetches all tasks', () async {
+    test('getActivities successfully fetches all tasks', () async {
       // Arrange
       final taskDataList = [
-        Task(id: '1', title: 'Task 1'),
-        Task(id: '2', title: 'Task 2'),
+        Task(
+          id: '1',
+          title: 'Test Task',
+          createdAt: DateTime.now(),
+          dueDate: DateTime.now().add(
+            const Duration(days: 1),
+          ),
+        ),
+        Task(
+          id: '2',
+          title: 'Test Task2',
+          createdAt: DateTime.now(),
+          dueDate: DateTime.now().add(
+            const Duration(days: 2),
+          ),
+        )
       ];
-      local.addTask(taskDataList[0]);
-      local.addTask(taskDataList[1]);
+
+      local.addActivity(taskDataList[0]);
+      local.addActivity(taskDataList[1]);
 
       // Act
-      final result = await local.geTasks();
+      final result = await local.getActivities();
 
       // Assert
       expect(result.length, 2);
       expect(result[0].id, '1');
-      expect(result[0].title, 'Task 1');
+      expect(result[0].title, 'Test Task');
       expect(result[1].id, '2');
-      expect(result[1].title, 'Task 2');
+      expect(result[1].title, 'Test Task2');
     });
   });
 
-  group("DriftLocalDataSource updateTask(task) Tests", () {
+  group("DriftLocalDataSource updateActivity(task) Tests", () {
     late DriftLocalDataSource local;
     late DriftAppDatabase database;
     setUp(() async {
@@ -176,30 +232,54 @@ void main() {
       await database.close();
     });
 
-    test('updateTask successfully updates an existing task', () async {
+    test('updateActivity successfully updates an existing task(Activity)',
+        () async {
       // Arrange
       const taskId = '1';
-      final taskData = Task(id: taskId, title: 'Old Task');
-      await local.addTask(taskData);
+      final taskData = Task(
+        id: taskId,
+        title: 'Test Task',
+        createdAt: DateTime.now(),
+        dueDate: DateTime.now().add(
+          const Duration(days: 1),
+        ),
+      );
+      await local.addActivity(taskData);
 
-      final updatedTask = Task(id: taskId, title: 'Updated Task');
+      final updatedTask = Task(
+        id: taskId,
+        title: 'Test Task updatedTask',
+        createdAt: DateTime.now(),
+        dueDate: DateTime.now().add(
+          const Duration(days: 2),
+        ),
+      );
 
       // Act
-      final result = await local.updateTask(updatedTask);
+      final result = await local.updateActivity(updatedTask);
 
       // Assert
       expect(result, true);
-      final updatedTaskData = await local.getTask(taskId);
-      expect(updatedTaskData?.title, updatedTask.title);
+      final updatedTaskData = await local.getActivity(taskId) as Task;
+      expect(updatedTaskData.title, updatedTask.title);
+      expect(updatedTaskData.dueDate.isAfter(taskData.dueDate), true);
     });
 
-    test('updateTask returns false when task does not exist', () async {
+    test('updateActivity returns false when task(Activity) does not exist',
+        () async {
       // Arrange
-      const taskId = '1';
-      final updatedTask = Task(id: taskId, title: 'Updated Task');
+      const taskId = '9';
+      final updatedTask = Task(
+        id: taskId,
+        title: 'Test Task updatedTask',
+        createdAt: DateTime.now(),
+        dueDate: DateTime.now().add(
+          const Duration(days: 2),
+        ),
+      );
 
       // Act
-      final result = await local.updateTask(updatedTask);
+      final result = await local.updateActivity(updatedTask);
 
       // Assert
       expect(result, false);
