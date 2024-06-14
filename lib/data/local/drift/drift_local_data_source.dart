@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import '../../../common/app_exception.dart';
 import '../../../common/app_logger/app_logger.dart';
 
 import '../../../data_models/activity.dart';
@@ -18,12 +19,8 @@ class DriftLocalDataSource implements DataSource {
   Future<bool> addActivity(Activity activity) async {
     if (activity is Task) {
       final task = activity;
-      if (!task.dueDate.isAfter(task.createdAt)) {
-        _logger.info(
-            "addActivity(): can't add new task having dueDate before createdAt date");
-        throw Exception('Task(Activity) dueDate must be after createdAt date');
-      }
       try {
+        _validateTaskInput(task);
         await _db.into(_db.taskDriftEntitry).insert(
               TaskDriftEntitryCompanion.insert(
                 title: task.title,
@@ -44,6 +41,9 @@ class DriftLocalDataSource implements DataSource {
           " Title: ${task.title} . Error: $e",
         );
         rethrow;
+      } on TaskDueDateException catch (e) {
+        _logger.severe("Invalid task due date.", e);
+        rethrow;
       } on Exception catch (e) {
         _logger.severe(
           "Failed to add task to the database. "
@@ -57,6 +57,13 @@ class DriftLocalDataSource implements DataSource {
     }
     _logger.error("Given Activity is not a Task");
     throw Exception("Given Activity is not a Task");
+  }
+
+  void _validateTaskInput(Task task) {
+    if (!task.dueDate.isAfter(task.createdAt)) {
+      throw TaskDueDateException(
+          'Task(Activity) dueDate must be after createdAt date');
+    }
   }
 
   @override

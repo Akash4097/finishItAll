@@ -1,4 +1,5 @@
 import 'package:drift/native.dart';
+import 'package:finish_it_all/common/app_exception.dart';
 import 'package:finish_it_all/data/local/drift/drift_app_database.dart';
 import 'package:finish_it_all/data/local/drift/drift_local_data_source.dart';
 import 'package:finish_it_all/data_models/task.dart';
@@ -81,8 +82,8 @@ void main() {
       );
 
       // Act & Assert
-      expect(
-          () async => await local.addActivity(task), throwsA(isA<Exception>()));
+      expect(() async => await local.addActivity(task),
+          throwsA(isA<TaskDueDateException>()));
     });
   });
 
