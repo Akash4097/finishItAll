@@ -6,9 +6,11 @@ class ActivityTimeTracker {
   Duration _remaining;
   bool _isRunning = false;
   final Function onTimeUp;
+  late final Duration _totalTime;
 
   ActivityTimeTracker(Duration totalDuration, this.onTimeUp)
-      : _remaining = totalDuration;
+      : _remaining = totalDuration,
+        _totalTime = totalDuration;
 
   void start() {
     if (_isRunning) return;
@@ -92,13 +94,19 @@ class ActivityTimeTracker {
     _dispose();
   }
 
+  void reset([Duration? newDuration]) {
+    _dispose();
+    _elapsed = Duration.zero;
+    _remaining = newDuration ?? _totalTime;
+  }
+
   void _dispose() {
     _isRunning = false;
     _timer?.cancel();
     _timer = null;
   }
 
-  Duration get elapsed => _elapsed;
+  Duration get elapsedTime => _elapsed;
   Duration get remaining => _remaining;
   bool get isRunning => _isRunning;
 }
