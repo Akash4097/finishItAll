@@ -20,6 +20,8 @@ void main() {
       final timer = ActivityTimeTracker(const Duration(seconds: 5), () {});
       timer.start();
       timer.pause();
+      expect(timer.isRunning, isFalse);
+
       timer.resume();
       expect(timer.isRunning, isTrue);
     });
@@ -29,7 +31,7 @@ void main() {
       timer.start();
       timer.reset(const Duration(seconds: 10));
       expect(timer.elapsedTime, Duration.zero);
-      expect(timer.remaining, const Duration(seconds: 10));
+      expect(timer.remainingTime, const Duration(seconds: 10));
     });
 
     test('elapsed time increases while running', () async {
@@ -44,8 +46,8 @@ void main() {
       final timer = ActivityTimeTracker(const Duration(seconds: 5), () {});
       timer.start();
       await Future.delayed(const Duration(seconds: 1));
-      expect(timer.remaining, lessThan(const Duration(seconds: 5)));
-      expect(timer.remaining, const Duration(seconds: 4));
+      expect(timer.remainingTime, lessThan(const Duration(seconds: 5)));
+      expect(timer.remainingTime, const Duration(seconds: 4));
     });
 
     test('timer calls onTimeUp when time is up', () async {
@@ -58,7 +60,7 @@ void main() {
       expect(called, isTrue);
     });
 
-    test('elapsed time does not increase after stopping', () async {
+    test('elapsed time does not increase after pause', () async {
       final timer = ActivityTimeTracker(const Duration(seconds: 1), () {});
       timer.start();
       await Future.delayed(const Duration(milliseconds: 100));
@@ -76,10 +78,13 @@ void main() {
         () {},
       );
       timer.start();
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(const Duration(seconds: 2));
       final startTime = timer.elapsedTime;
+      final remainingTime = timer.remainingTime;
+      expect(timer.isRunning, isTrue);
       timer.start();
       expect(timer.elapsedTime, startTime);
+      expect(timer.remainingTime, remainingTime);
     });
 
     test(
@@ -93,7 +98,7 @@ void main() {
       timer.reset();
       expect(timer.isRunning, isFalse);
       expect(timer.elapsedTime, Duration.zero);
-      expect(timer.remaining, totalTime);
+      expect(timer.remainingTime, totalTime);
     });
   });
 }

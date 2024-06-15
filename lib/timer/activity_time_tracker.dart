@@ -1,6 +1,8 @@
 import 'dart:async';
 
 class ActivityTimeTracker {
+  static const Duration _oneSecond = Duration(seconds: 1);
+
   Timer? _timer;
   Duration _elapsed = Duration.zero;
   Duration _remaining;
@@ -15,14 +17,16 @@ class ActivityTimeTracker {
   void start() {
     if (_isRunning) return;
     _isRunning = true;
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      _elapsed += const Duration(seconds: 1);
-      _remaining -= const Duration(seconds: 1);
-      if (_remaining <= Duration.zero) {
-        _dispose();
-        onTimeUp();
-      }
-    });
+    _timer = Timer.periodic(_oneSecond, _handleTimerTick);
+  }
+
+  void _handleTimerTick(Timer timer) {
+    _elapsed += _oneSecond;
+    _remaining -= _oneSecond;
+    if (_remaining <= Duration.zero) {
+      _dispose();
+      onTimeUp();
+    }
   }
 
   void pause() {
@@ -34,61 +38,8 @@ class ActivityTimeTracker {
   void resume() {
     if (_isRunning) return;
     _isRunning = true;
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      _elapsed += const Duration(seconds: 1);
-      _remaining -= const Duration(seconds: 1);
-      if (_remaining <= Duration.zero) {
-        _dispose();
-        onTimeUp();
-      }
-    });
+    _timer = Timer.periodic(_oneSecond, _handleTimerTick);
   }
-
-//   import 'package:flutter_test/flutter_test.dart';
-// import 'package:your_app/timer/activity_timmer.dart';
-
-// void main() {
-//   group('ActivityTimmer', () {
-//     test('start timer', () {
-//       final timer = ActivityTimmer();
-//       timer.start();
-//       expect(timer.isRunning, isTrue);
-//     });
-
-//     test('stop timer', () {
-//       final timer = ActivityTimmer();
-//       timer.start();
-//       timer.stop();
-//       expect(timer.isRunning, isFalse);
-//     });
-
-//     test('reset timer', () {
-//       final timer = ActivityTimmer();
-//       timer.start();
-//       timer.reset();
-//       expect(timer.isRunning, isFalse);
-//       expect(timer.elapsedTime, Duration.zero);
-//     });
-
-//     test('elapsed time increases while running', () async {
-//       final timer = ActivityTimmer();
-//       timer.start();
-//       final startTime = timer.elapsedTime;
-//       await Future.delayed(const Duration(milliseconds: 100));
-//       expect(timer.elapsedTime, greaterThan(startTime));
-//     });
-
-//     test('elapsed time does not increase after stopping', () async {
-//       final timer = ActivityTimmer();
-//       timer.start();
-//       await Future.delayed(const Duration(milliseconds: 100));
-//       final elapsedTime = timer.elapsedTime;
-//       timer.stop();
-//       await Future.delayed(const Duration(milliseconds: 100));
-//       expect(timer.elapsedTime, equals(elapsedTime));
-//     });
-//   });
-// }
 
   void close() {
     _dispose();
@@ -107,6 +58,6 @@ class ActivityTimeTracker {
   }
 
   Duration get elapsedTime => _elapsed;
-  Duration get remaining => _remaining;
+  Duration get remainingTime => _remaining;
   bool get isRunning => _isRunning;
 }
