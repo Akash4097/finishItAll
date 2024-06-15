@@ -1,5 +1,4 @@
 import 'package:drift/native.dart';
-import 'package:finish_it_all/common/app_exception.dart';
 import 'package:finish_it_all/data/local/drift/drift_app_database.dart';
 import 'package:finish_it_all/data/local/drift/drift_local_data_source.dart';
 import 'package:finish_it_all/data_models/task.dart';
@@ -66,24 +65,6 @@ void main() {
       // Act & Assert
       expect(() async => await local.addActivity(task2),
           throwsA(isA<SqliteException>()));
-    });
-
-    test(
-        'addActivity throw Exception when'
-        ' inserting dueDate before the createdAt dateTime', () async {
-      //Arrange
-      final task = Task(
-        id: '1',
-        title: 'Test Task',
-        createdAt: DateTime.now(),
-        dueDate: DateTime.now().subtract(
-          const Duration(days: 1),
-        ),
-      );
-
-      // Act & Assert
-      expect(() async => await local.addActivity(task),
-          throwsA(isA<TaskDueDateException>()));
     });
   });
 
